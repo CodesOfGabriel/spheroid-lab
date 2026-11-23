@@ -10,7 +10,7 @@ Para a imagem em cinza $I$ e o filtro gaussiano $G_\sigma$, o fundo $B$, a image
 B=G_{60}*I,\qquad F=\frac{I}{B+10^{-6}},\qquad D=G_3*|F-1|.
 ```
 
-A máscara inicial é $D>T_{\mathrm{Otsu}}$. O algoritmo preenche vazios internos, remove componentes com menos de 15.000 px², aplica abertura com disco de raio 8 px e preenche vazios novamente. Registra a contagem de componentes e seleciona o maior componente conexo, $M_0$. A máscara final é:
+A máscara inicial é $`D>T_{\mathrm{Otsu}}`$. O algoritmo preenche vazios internos, remove componentes com menos de 15.000 px², aplica abertura com disco de raio 8 px e preenche vazios novamente. Registra a contagem de componentes e seleciona o maior componente conexo, $M_0$. A máscara final é:
 
 ```math
 M=\mathrm{preencher}\left(\left[G_6*M_0>0{,}5\right]\right).
@@ -37,7 +37,7 @@ $`M(x,y)\in\{0,1\}`$ indica os pixels da região medida, $P$ é o perímetro e $
 | Aspect ratio, `aspect_ratio` | $\displaystyle AR=\frac{L}{\max(l,1\ \mathrm{px})}$ | Alongamento da elipse de momentos. O código usa piso de 1 px no denominador de $L/l$. |
 | Solidity geométrica, `solidity` | $\displaystyle S=\frac{A}{A_{\mathrm{convexa}}}$ | Fração ocupada do fecho convexo. |
 | Diâmetro equivalente, `diam_equiv_px` | $\displaystyle D_{\mathrm{eq}}=2\sqrt{\frac{A}{\pi}}$ | Diâmetro, em px, do círculo com a mesma área projetada. |
-| Feret máximo, `feret_max_px` | $\displaystyle F_{\max}=\max_{p,q\in\partial H}\lVert p-q\rVert_2$ | Maior distância em px entre pontos do contorno do fecho convexo $H$, estimado por `regionprops.feret_diameter_max`. |
+| Feret máximo, `feret_max_px` | $\displaystyle F_{\max}=\max_{p,q\in\partial H}\left\Vert p-q\right\Vert_{2}$ | Maior distância em px entre pontos do contorno do fecho convexo $H$, estimado por `regionprops.feret_diameter_max`. |
 | Eixo menor, `eixo_menor_px` | $l$ | Comprimento em px. O rótulo histórico `feret_min_px` é lido como eixo menor. MinFeret exige um estimador de calibre mínimo. |
 | Circularidade sem suavização, `circularidade_sem_suavizar` | $\displaystyle C_0=\frac{4\pi A_0}{P_0^2}$ | A fórmula da circularidade no maior componente antes da suavização. |
 
