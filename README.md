@@ -2,6 +2,8 @@
 
 Aplicação local para medir **forma e área projetada de esferoides em micrografias 2D de campo claro**. Importe imagens, revise os contornos no navegador e obtenha os resultados em CSV. Os dados ficam na máquina que executa a aplicação.
 
+Autor principal: [Gabriel Santos (@CodesOfGabriel)](https://github.com/CodesOfGabriel).
+
 ## Instalação
 
 Instale Python 3.11 ou mais recente. Clone este repositório pelo botão **Code** do GitHub e abra um terminal na pasta clonada.
