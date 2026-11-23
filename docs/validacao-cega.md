@@ -38,11 +38,15 @@ Acesse [Validação Cega](http://127.0.0.1:7860/validacao/). O perfil administra
 
 Sejam $O$ a máscara oficial e $H$ a máscara humana, na mesma grade. O relatório compara as máscaras segmentadas e, separadamente, as silhuetas preenchidas. Para cada comparação, exporta:
 
-$$\mathrm{Dice}=\frac{2|O\cap H|}{|O|+|H|},\qquad
-\mathrm{IoU}=\frac{|O\cap H|}{|O\cup H|}.$$
+```math
+\mathrm{Dice}=\frac{2|O\cap H|}{|O|+|H|},\qquad
+\mathrm{IoU}=\frac{|O\cap H|}{|O\cup H|}.
+```
 
-$$\Delta A=A_H-A_O,\qquad
-\mathrm{erro\ relativo}\,[\%]=100\,\frac{|A_H-A_O|}{A_O}.$$
+```math
+\Delta A=A_H-A_O,\qquad
+\mathrm{erro\ relativo}\,[\%]=100\,\frac{|A_H-A_O|}{A_O}.
+```
 
 Denominadores nulos produzem medidas ausentes. Para os descritores da máscara, a área é a soma dos pixels, o perímetro externo usa a silhueta preenchida, a circularidade vale $4\pi A/P_{\mathrm{externo}}^2$ e a solidez vale $A/A_{\mathrm{convexa}}$. A diferença absoluta para uma medida $x$ é $|x_H-x_O|$.
 

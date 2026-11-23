@@ -6,21 +6,27 @@ O Spheroid Lab mede projeções 2D. Áreas são expressas em **px²**, comprimen
 
 Para a imagem em cinza $I$ e o filtro gaussiano $G_\sigma$, o fundo $B$, a imagem corrigida $F$ e o mapa de desvio $D$ são:
 
-$$B=G_{60}*I,\qquad F=\frac{I}{B+10^{-6}},\qquad D=G_3*|F-1|.$$
+```math
+B=G_{60}*I,\qquad F=\frac{I}{B+10^{-6}},\qquad D=G_3*|F-1|.
+```
 
 A máscara inicial é $D>T_{\mathrm{Otsu}}$. O algoritmo preenche vazios internos, remove componentes com menos de 15.000 px², aplica abertura com disco de raio 8 px e preenche vazios novamente. Registra a contagem de componentes e seleciona o maior componente conexo, $M_0$. A máscara final é:
 
-$$M=\operatorname{preencher}\left(\left[G_6*M_0>0{,}5\right]\right).$$
+```math
+M=\mathrm{preencher}\left(\left[G_6*M_0>0{,}5\right]\right).
+```
 
-O traçado manual entra no pós-processamento com preenchimento, seleção do maior componente e a mesma suavização. No revisor, o mapa é convertido para 8 bits a partir do percentil 99,5. O controle usa $\sigma_\mathrm{fundo}\in\{30,45,60,90,120,180\}$ e deslocamento $\delta\in[-60,60]$:
+O traçado manual entra no pós-processamento com preenchimento, seleção do maior componente e a mesma suavização. No revisor, o mapa é convertido para 8 bits a partir do percentil 99,5. O controle usa $`\sigma_{\mathrm{fundo}}\in\{30,45,60,90,120,180\}`$ e deslocamento $\delta\in[-60,60]$:
 
-$$D_8=\left\lfloor255\,\operatorname{clip}\left(\frac{D}{\max(Q_{99{,}5}(D),10^{-9})},0,1\right)\right\rfloor,\qquad T_8=\operatorname{clip}\!\left(T_{\mathrm{Otsu}}(D_8)+\delta,1,254\right).$$
+```math
+D_8=\left\lfloor255\,\mathrm{clip}\left(\frac{D}{\max(Q_{99{,}5}(D),10^{-9})},0,1\right)\right\rfloor,\qquad T_8=\mathrm{clip}\!\left(T_{\mathrm{Otsu}}(D_8)+\delta,1,254\right).
+```
 
 A quantização pode mudar o contorno mesmo com $\delta=0$. A medição em lote usa o mapa em ponto flutuante. Exposição e contraste da interface atuam na visualização. [Parâmetros](../src/esferoides/config.py) · [Segmentação](../src/esferoides/segmentacao.py).
 
 ## Medidas da máscara
 
-$M(x,y)\in\{0,1\}$ indica os pixels da região medida, $P$ é o perímetro e $A_{\mathrm{convexa}}$ é a área do fecho convexo rasterizado. Os comprimentos $L$ e $l$ vêm da elipse de segundos momentos. Para os autovalores normalizados $\lambda_{\max}$ e $\lambda_{\min}$, valem $L=4\sqrt{\lambda_{\max}}$ e $l=4\sqrt{\lambda_{\min}}$.
+$`M(x,y)\in\{0,1\}`$ indica os pixels da região medida, $P$ é o perímetro e $A_{\mathrm{convexa}}$ é a área do fecho convexo rasterizado. Os comprimentos $L$ e $l$ vêm da elipse de segundos momentos. Para os autovalores normalizados $\lambda_{\max}$ e $\lambda_{\min}$, valem $L=4\sqrt{\lambda_{\max}}$ e $l=4\sqrt{\lambda_{\min}}$.
 
 | Métrica e coluna | Fórmula ou estimador | Interpretação |
 |---|---|---|
@@ -41,11 +47,15 @@ $M(x,y)\in\{0,1\}$ indica os pixels da região medida, $P$ é o perímetro e $A_
 
 Para o mesmo esferoide na mesma placa, com referência válida em D0, a coluna `area_norm_D0` é:
 
-$$A_{\mathrm{rel}}(t)=\frac{A_t}{A_{D0}}.$$
+```math
+A_{\mathrm{rel}}(t)=\frac{A_t}{A_{D0}}.
+```
 
 A aba **Resultados** usa apenas correções manuais e exige um D0 manual para a normalização. A triagem calcula variação relativa entre tempos disponíveis a partir de D1 e relata o percentual quando sinaliza um aumento:
 
-$$\Delta A(t_1,t_0)\,[\%]=100\,\frac{A_{t_1}-A_{t_0}}{A_{t_0}}.$$
+```math
+\Delta A(t_1,t_0)\,[\%]=100\,\frac{A_{t_{1}}-A_{t_{0}}}{A_{t_{0}}}.
+```
 
 O denominador deve ser positivo. Para tempos consecutivos, use $t_1=t$ e $t_0=t-1$. O CSV principal exporta as áreas e a área normalizada. Os gráficos mostram mediana e o intervalo de $Q_{25}$ a $Q_{75}$. O relatório de triagem também exporta médias e desvios padrão amostrais por grupo e dia. Separe as unidades biológicas independentes e mantenha o pareamento por esferoide em análises inferenciais.
 
@@ -59,20 +69,28 @@ A comparação numérica entre programas depende da máscara, do tratamento de v
 
 **Mean Gray Value (MGV)** é a intensidade média dos $N$ pixels de uma região de interesse:
 
-$$MGV=\frac{1}{N}\sum_{i=1}^{N} I_i.$$
+```math
+MGV=\frac{1}{N}\sum_{i=1}^{N} I_i.
+```
 
 **Índice óptico normalizado (MGVi)** usa os extremos observados dentro de cada experimento biológico independente:
 
-$$MGVi_i=\frac{MGV_{\max}-MGV_i}{MGV_{\max}-MGV_{\min}}.$$
+```math
+{MGVi}_{i}=\frac{MGV_{\max}-MGV_i}{MGV_{\max}-MGV_{\min}}.
+```
 
 O índice varia de 0 a 1 quando o intervalo é positivo. Valores maiores correspondem a micrografias relativamente mais escuras sob condições de aquisição padronizadas. Um intervalo zero deixa o índice indefinido.
 
 **Área calibrada** usa dimensões físicas verificadas para cada pixel, $s_x$ e $s_y$, em µm:
 
-$$A_{\mu\mathrm{m}^2}=N_{\mathrm{pixels}}\,s_x\,s_y.$$
+```math
+A_{\mu\mathrm{m}^2}=N_{\mathrm{pixels}}\,s_x\,s_y.
+```
 
 **Liberação de LDH** usa as atividades do ensaio bioquímico em unidades comparáveis:
 
-$$LDH_{\mathrm{liberada}}\,[\%]=100\,\frac{LDH_{\mathrm{extra}}}{LDH_{\mathrm{extra}}+LDH_{\mathrm{intra}}}.$$
+```math
+LDH_{\mathrm{liberada}}\,[\%]=100\,\frac{LDH_{\mathrm{extra}}}{LDH_{\mathrm{extra}}+LDH_{\mathrm{intra}}}.
+```
 
 Essas quatro fórmulas são referências metodológicas externas ao CSV do aplicativo. [Artigo de referência, Molecular Biology Reports](https://link.springer.com/article/10.1007/s11033-026-12715-9).
