@@ -10,10 +10,10 @@ Para a imagem em cinza $I$ e o filtro gaussiano $G_\sigma$, o fundo $B$, a image
 B=G_{60}*I,\qquad F=\frac{I}{B+10^{-6}},\qquad D=G_3*|F-1|.
 ```
 
-A máscara inicial é $`D>T_{\mathrm{Otsu}}`$. O algoritmo preenche vazios internos, remove componentes com menos de 15.000 px², aplica abertura com disco de raio 8 px e preenche vazios novamente. Registra a contagem de componentes e seleciona o maior componente conexo, $M_0$. A máscara final é:
+A máscara inicial é $`D\gt T_{\mathrm{Otsu}}`$. O algoritmo preenche vazios internos, remove componentes com menos de 15.000 px², aplica abertura com disco de raio 8 px e preenche vazios novamente. Registra a contagem de componentes e seleciona o maior componente conexo, $M_0$. A máscara final é:
 
 ```math
-M=\mathrm{preencher}\left(\left[G_6*M_0>0{,}5\right]\right).
+M=\mathrm{preencher}\left(\left[G_6*M_0\gt 0{,}5\right]\right).
 ```
 
 O traçado manual entra no pós-processamento com preenchimento, seleção do maior componente e a mesma suavização. No revisor, o mapa é convertido para 8 bits a partir do percentil 99,5. O controle usa $`\sigma_{\mathrm{fundo}}\in\{30,45,60,90,120,180\}`$ e deslocamento $\delta\in[-60,60]$:
