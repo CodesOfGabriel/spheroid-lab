@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Projetos · Spheroid Lab</title>
+  <link rel="stylesheet" href="/estatico/projetos.css">
+  <script src="/estatico/projetos.js" defer></script>
+</head>
+<body>
+  <header class="cabecalho">
+    <div class="limite marca"><span aria-hidden="true" class="marca-icone"></span> Spheroid Lab</div>
+  </header>
+  <main class="limite">
+    <div class="titulo">
+      <h1>Projetos</h1>
+      <p>Fotos, medidas e revisões em um só lugar.</p>
+    </div>
+    <p id="aviso" role="status" hidden></p>
+    <div class="grade" id="projetos">
+      <button class="novo" id="novo" type="button">
+        <span class="mais" aria-hidden="true">+</span>
+        <strong>Novo projeto</strong>
+      </button>
+    </div>
+  </main>
+
+  <dialog id="janela" aria-labelledby="tituloNovo">
+    <form id="importar">
+      <h2 id="tituloNovo">Novo projeto</h2>
+      <label for="nome">Nome do projeto</label>
+      <input id="nome" name="nome" required maxlength="80" autocomplete="off" autofocus>
+      <label for="pasta">Pasta de imagens</label>
+      <input id="pasta" type="file" webkitdirectory multiple required aria-describedby="formato">
+      <p id="formato">Escolha uma pasta com fotos no formato <code>n1/d0/D0 LC1.png</code>.
+        Inclua <code>_analise</code> para trazer as medidas e revisões existentes.</p>
+      <p id="mensagem" role="status" hidden></p>
+      <div class="acoes">
+        <button id="cancelar" type="button">Cancelar</button>
+        <button class="principal" id="criar" type="submit">Criar projeto</button>
+      </div>
+    </form>
+  </dialog>
+</body>
+</html>

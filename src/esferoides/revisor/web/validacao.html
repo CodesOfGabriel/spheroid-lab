@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf }}">
+  <title>Validação Cega · Spheroid Lab</title>
+  <link rel="stylesheet" href="{{ url_for('estatico', nome='estilo.css') }}">
+  <link rel="stylesheet" href="{{ url_for('estatico', nome='validacao.css') }}">
+  {% if papel %}
+  <script type="module" src="{{ url_for('estatico', nome='validacao.js') }}"></script>
+  {% endif %}
+</head>
+<body class="validacao" data-perfil="{{ papel or '' }}">
+  <header class="abas">
+    <span class="aba on">Validação Cega</span>
+    <span class="cresc"></span>
+    {% if papel %}
+    <span>{{ 'Administrador' if papel == 'admin' else avaliadora }}</span>
+    <form method="post" action="{{ url_for('sair') }}">
+      <input name="csrf" type="hidden" value="{{ csrf }}">
+      <button>Sair</button>
+    </form>
+    {% endif %}
+  </header>
+  {% if not papel %}
+  <main class="vc-login">
+    <form method="post" action="{{ url_for('entrar') }}" class="vc-card">
+      <h1>Acesso à Validação Cega</h1>
+      <input name="csrf" type="hidden" value="{{ csrf }}">
+      <label>Perfil
+        <select name="perfil" autocomplete="username">
+          <option value="avaliadora">Avaliadora</option>
+          <option value="admin">Administrador</option>
+        </select>
+      </label>
+      <label>Senha <input type="password" name="senha" autocomplete="current-password" required></label>
+      {% if erro %}<p role="alert" class="vc-erro">{{ erro }}</p>{% endif %}
+      <button class="on">Entrar</button>
+    </form>
+  </main>
+  {% elif papel == 'admin' %}
+  <main class="vc-admin">
+    <section class="vc-card">
+      <h1>Sessão de validação</h1>
+      <p id="situacao" role="status">Carregando sessão…</p>
+      <div class="vc-acoes">
+        <button id="preparar" class="on" hidden>Preparar {{ total }} imagens</button>
+        <a id="pacote" class="vc-botao" href="{{ url_for('pacote') }}" hidden>Baixar pacote anonimizado</a>
+        <button id="encerrar" hidden>Encerrar avaliação</button>
+        <a id="exportar" class="vc-botao" href="{{ url_for('resultados') }}" hidden>Exportar validação cega</a>
+      </div>
+      <p id="mensagem" role="status"></p>
+    </section>
+    <section id="vc-acompanhamento" class="vc-card" hidden>
+      <h2>Progresso</h2>
+      <progress id="progresso" max="{{ total }}" value="0" aria-label="Imagens com avaliação finalizada"></progress>
+      <p id="contagem"></p>
+      <ol id="fila"></ol>
+    </section>
+    <section id="vc-resultados" class="vc-card" hidden>
+      <h2>Concordância</h2>
+      <label>Resumo por
+        <select id="resumo-estrato">
+          <option value="global">Amostra</option>
+          <option value="dia">Dia</option>
+          <option value="placa">Placa</option>
+          <option value="grupo">Grupo</option>
+        </select>
+      </label>
+      <p id="status-resultados" role="status"></p>
+      <div class="vc-tabela">
+        <table><thead><tr>
+          <th>Comparação</th><th>Estrato</th><th>Pares</th><th>Dice</th>
+          <th>IoU</th><th>Erro relativo de área (%)</th>
+        </tr></thead><tbody id="resumo-linhas"></tbody></table>
+      </div>
+    </section>
+  </main>
+  {% else %}
+  <main class="vc-avaliacao">
+    <aside class="vc-lateral">
+      <div class="head">
+        <h1>Micrografias</h1>
+        <div id="contagem" role="status"></div>
+        <progress id="progresso" max="{{ total }}" value="0" aria-label="Imagens com avaliação finalizada"></progress>
+        <label for="navegar">Abrir imagem</label>
+        <select id="navegar" aria-label="Abrir imagem" disabled></select>
+      </div>
+      <ol id="fila" aria-label="Fila anonimizada"></ol>
+    </aside>
+    <section class="vc-editor">
+      <div class="toolbar vc-titulo">
+        <h1 id="codigo">Validação Cega</h1>
+        <span id="situacao" role="status">Carregando sessão…</span>
+      </div>
+      <details class="vc-instrucoes">
+        <summary>Instruções de anotação</summary>
+        <ol>
+          <li>Trace a silhueta do maior corpo contínuo do agregado. Deixe de fora fragmentos isolados, resíduos e elementos do poço.</li>
+          <li>Feche o contorno pelo limite externo mais plausível. Mantenha na silhueta os espaços totalmente cercados pelo contorno.</li>
+          <li>Na camada Regiões internas, marque as áreas que identificar como fundo dentro da silhueta. Mantenha no agregado áreas claras que ainda mostrem tecido, textura ou continuidade. Brilho, por si só, é insuficiente.</li>
+          <li>Em bordas ou regiões duvidosas, use seu melhor julgamento e indique a ambiguidade com uma observação. Se não for possível segmentar com confiança, marque como não avaliável e informe o motivo.</li>
+          <li>Para desenhar um polígono, clique nos vértices e use Fechar polígono. Use Mover ou a roda do mouse para examinar outras regiões e escalas.</li>
+        </ol>
+      </details>
+      <fieldset id="ferramentas" class="toolbar" disabled>
+        <label>Camada
+          <select id="camada">
+            <option value="externa">Silhueta externa</option>
+            <option value="interna">Regiões internas</option>
+          </select>
+        </label>
+        <div role="group" aria-label="Ferramentas de desenho" class="vc-grupo">
+          <button data-ferramenta="poligono" class="on" aria-pressed="true">Polígono</button>
+          <button id="fecharPoligono" disabled>Fechar polígono</button>
+          <button data-ferramenta="pincel" aria-pressed="false">Pincel</button>
+          <button data-ferramenta="borracha" aria-pressed="false">Borracha</button>
+        </div>
+        <label class="rng">Diâmetro <input id="diametro" type="range" min="2" max="160" value="26"></label>
+        <div role="group" aria-label="Histórico de edição" class="vc-grupo">
+          <button id="desfazer" disabled>Desfazer</button>
+          <button id="refazer" disabled>Refazer</button>
+        </div>
+      </fieldset>
+      <div class="toolbar vc-vista">
+        <button id="mover" aria-pressed="false">Mover</button>
+        <button id="menosZoom" aria-label="Reduzir zoom">−</button>
+        <button id="maisZoom" aria-label="Ampliar zoom">+</button>
+        <button id="enquadrar">Enquadrar</button>
+        <span id="nivelZoom" class="kbd"></span>
+        <label class="rng">Opacidade <input id="opacidade" type="range" min="0" max="100" value="35"></label>
+        <span class="vc-legenda"><i></i> Silhueta <i></i> Fundo interno</span>
+      </div>
+      <div id="vc-stage" aria-label="Área de desenho">
+        <div id="vc-wrap" hidden>
+          <canvas id="vc-foto"></canvas>
+          <canvas id="vc-mascara"></canvas>
+        </div>
+      </div>
+      <fieldset id="decisao" class="toolbar vc-decisao" disabled>
+        <label><input type="checkbox" id="ambigua"> Caso ambíguo</label>
+        <label class="vc-nota">Observações técnicas <textarea id="nota" maxlength="2000" rows="2"></textarea></label>
+        <button id="salvar">Salvar</button>
+        <button id="concluir" class="on">Concluir imagem</button>
+        <button id="excluir">Marcar como não avaliável</button>
+      </fieldset>
+      <div class="toolbar vc-rodape">
+        <span id="mensagem" role="status"></span>
+        <span class="cresc"></span>
+        <button id="anterior" disabled>Anterior</button>
+        <button id="proxima" disabled>Próxima imagem</button>
+      </div>
+    </section>
+    <dialog id="justificar">
+      <form method="dialog">
+        <label for="motivo">Justificativa técnica da exclusão</label>
+        <textarea id="motivo" maxlength="1000" rows="4" required></textarea>
+        <div class="vc-acoes">
+          <button value="cancelar" formnovalidate>Cancelar</button>
+          <button value="confirmar" class="on">Confirmar</button>
+        </div>
+      </form>
+    </dialog>
+  </main>
+  {% endif %}
+</body>
+</html>

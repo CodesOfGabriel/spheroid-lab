@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "esferoides"
+version = "0.1.0"
+description = "Spheroid Lab: morfometria 2D de esferoides com revisão assistida de contornos"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+keywords = ["microscopia", "esferoides", "morfometria", "segmentacao", "scikit-image"]
+
+dependencies = [
+    "numpy>=1.26",
+    "scipy>=1.11",
+    "scikit-image>=0.22",
+    "pillow>=10.0",
+    "pandas>=2.1",
+    "matplotlib>=3.8",
+    "flask>=3.0",
+]
+
+[project.optional-dependencies]
+qr = ["qrcode>=7.4"]                      # QR no terminal, para abrir no tablet
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+[project.scripts]
+esferoides = "esferoides.cli:main"
+spheroid-lab = "esferoides.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+esferoides = ["revisor/web/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+ignore = ["E501"]

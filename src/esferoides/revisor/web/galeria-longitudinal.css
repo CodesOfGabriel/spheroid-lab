@@ -1,0 +1,18 @@
+:root {
+  color-scheme: dark;
+  color: #f2f2f0;
+  background: #101012;
+}
+
+p, .avulso, .ausente { color: #b1b7b4; }
+select, button, dialog { background: #222528; border-color: #3b4140; }
+input { accent-color: #a4e1c1; }
+:focus-visible { outline-color: #a4e1c1; }
+.grade { background: #17171a; border-color: #3b4140; }
+thead th { background: #233b32; color: #a4e1c1; }
+tbody th, tbody td { border-color: #303433; }
+tbody tr:nth-child(even), .miniatura { background: #1c1e20; }
+.ausente { border-color: #64776f; }
+.estado { background: #463521; color: #ffdda1; }
+dialog::backdrop { background: #08090bcc; }
+#mini-dias button[aria-current="true"] { background: #a4e1c1; color: #14271f; border-color: #a4e1c1; }

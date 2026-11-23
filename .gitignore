@@ -1,0 +1,66 @@
+# ---------------------------------------------------------------------------
+# DADOS. As imagens e as saídas da análise ficam FORA do repositório: são
+# centenas de MB de PNG. Aponte para elas com a variável ESFEROIDES_DADOS.
+# ---------------------------------------------------------------------------
+dados/
+_analise/
+*.png
+*.tif
+*.tiff
+*.jpg
+*.jpeg
+!docs/img/*.png
+
+# saídas da análise, caso alguém rode dentro do repositório
+resultados/
+conferencia/
+folhas_contato/
+figuras/
+mascaras_auto/
+mascaras_revisadas/
+mapas_desvio/
+*.db
+*.db-wal
+*.db-shm
+*.jsonl
+*.csv
+!tests/dados/*.csv
+
+# ---------------------------------------------------------------------------
+# Python
+# ---------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.env
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ---------------------------------------------------------------------------
+# Sistema e editores
+# ---------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+
+# Documentos, chaves e dados de experimentos mantidos localmente
+.env.*
+**/acesso-local.txt
+*.pem
+*.key
+*.pfx
+*.sqlite*
+*.zip
+*.pdf
+*.docx
+*.xlsx

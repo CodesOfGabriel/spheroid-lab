@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>{{ nome_projeto or 'Revisor de contornos' }} · Spheroid Lab</title>
+<link rel="stylesheet" href="/estatico/estilo.css">
+<script src="/estatico/app.js" defer></script>
+</head>
+<body>
+<div id="app">
+  <aside>
+    <div class="head">
+      <h1>{{ nome_projeto or 'Revisor de contornos' }}</h1>
+      <div class="prog" id="prog">—</div>
+      <div class="bar"><i id="barra"></i></div>
+    </div>
+    <input id="filtro" placeholder="filtrar (ex.: n1 LC, D0, pendente)">
+    <div id="lista"></div>
+  </aside>
+
+  <main>
+    <div class="abas">
+      {% if nome_projeto %}<a class="aba abaLink voltarProjetos" href="/">← Projetos</a>{% endif %}
+      <button id="abaConf" class="aba on">Conferência</button>
+      <button id="abaRes" class="aba">Resultados</button>
+      <button id="abaGaleria" class="aba" title="Mostra as fotos por placa e dia">Galeria</button>
+      {% if mostrar_validacao %}<a class="aba abaLink" href="/validacao/">Validação Cega</a>{% endif %}
+      <span class="cresc"></span>
+      <span id="resumoAba" class="kbd"></span>
+    </div>
+
+    <section id="painelResultados" hidden>
+      <div class="avisoRes">
+        <b>O painel resume apenas as imagens com correção manual.</b> Se você
+        priorizou imagens sinalizadas, considere essa seleção ao interpretar
+        o resumo.
+      </div>
+      <div id="cartoes" class="cartoes"></div>
+      <div class="toolbar" style="border-top:1px solid var(--line)">
+        <button id="bGrupos">Mostrar por grupo</button>
+        <span class="kbd" id="dicaGrupos">o agregado por dia não revela grupo nenhum</span>
+        <span class="cresc"></span>
+        <button id="bAtualizar">↻ Atualizar</button>
+      </div>
+      <div id="graficos" class="graficos"></div>
+    </section>
+
+    <iframe id="painelGaleria" title="Galeria de esferoides" hidden></iframe>
+
+    <div id="painelConferencia">
+    <div class="toolbar">
+      <button id="tPincel" class="on" title="Pincel (B)">✏︎ Pincel</button>
+      <button id="tLaco" title="Laço — clique para marcar vértices, Enter fecha (L)">⬡ Laço</button>
+      <button id="bMagico" title="Pincel mágico (M) — a seleção gruda na borda de maior contraste">✨ Mágico</button>
+      <label class="rng" id="wSensib" style="display:none">sensib.
+        <input type="range" id="sensib" min="-60" max="60" value="0">
+        <span id="sensibV" style="width:26px">0</span></label>
+      <button id="bAjustes" title="Ajuste rápido: exposição, contraste e limiar (J)">🎚 Ajustes</button>
+      <div class="sep"></div>
+      <button id="mAdd" class="on" title="Adicionar (A)">＋ Adicionar</button>
+      <button id="mDel" title="Apagar (E) — ou segure Alt / botão direito">− Apagar</button>
+      <div class="sep"></div>
+      <label class="rng">Tamanho <input type="range" id="tam" min="4" max="260" value="46">
+        <span id="tamV" style="width:30px">46</span></label>
+      <div class="sep"></div>
+      <button id="bUndo" title="Desfazer (Ctrl+Z)">↶ Desfazer</button>
+      <button id="bLimpar" title="Apagar toda a seleção">✕ Limpar</button>
+      <button id="bAuto" title="Voltar ao contorno automático">↺ Automático</button>
+      <button id="bAplicar" title="Aplicar o pós-processamento e ver o contorno final">⟳ Aplicar</button>
+      <div class="cresc"></div>
+      <button id="bDedo" title="O que o dedo faz: desenhar ou mover a imagem">👆 dedo: —</button>
+      <button id="bPressao" title="Caneta: variar a espessura conforme a pressão">✎ pressão</button>
+      <button id="bLista" title="Mostrar/ocultar a lista">☰</button>
+      <span class="kbd dicaTeclado">roda = zoom · espaço = mover</span>
+      <span class="kbd dicaToque" style="display:none">2 dedos = zoom e mover</span>
+      <button id="bFit" title="Enquadrar (0)">⤢</button>
+    </div>
+
+    <div id="stage">
+      <div id="wrap">
+        <canvas id="photo"></canvas>
+        <canvas id="over"></canvas>
+      </div>
+      <div id="cursor"></div>
+
+      <!-- Ajuste rápido. Fica sobre o stage e por isso TODO ele é [data-ui]:
+           sem isso o pointerdown borbulha, o stage captura o ponteiro e uma
+           pincelada começa por baixo do card. -->
+      <div class="ajustes" id="ajustes" data-ui hidden>
+        <div class="cab">
+          <b>Ajuste rápido</b>
+          <button id="bAjustesFechar" data-ui type="button" title="Fechar (J)">✕</button>
+        </div>
+
+        <div class="secao">
+          <h4>Ver <em>· não muda medida nenhuma</em></h4>
+          <label class="lin">
+            <span>exposição</span>
+            <input type="range" id="aExpo" min="-100" max="100" value="0" data-ui>
+            <i id="aExpoV">0</i>
+          </label>
+          <label class="lin">
+            <span>contraste</span>
+            <input type="range" id="aContr" min="-100" max="100" value="0" data-ui>
+            <i id="aContrV">0</i>
+          </label>
+          <button id="bMapa" data-ui type="button" class="largo"
+                  title="Mostrar o mapa |flat−1| em que o corte é feito (V)">
+            👁 ver o mapa de desvio</button>
+          <p class="obs" id="obsMapa">A segmentação não olha o brilho da foto: ela
+             corta o <b>mapa de desvio</b>. Exposição e contraste só ajudam o seu olho —
+             o flat-field cancela ganho, então eles não mexem no contorno.</p>
+        </div>
+
+        <div class="secao muda">
+          <h4>Segmentar <em>· muda o contorno</em></h4>
+          <label class="lin">
+            <span>limiar</span>
+            <input type="range" id="aLim" min="-60" max="60" value="0" data-ui>
+            <i id="aLimV">0</i>
+          </label>
+          <label class="lin">
+            <span>fundo σ</span>
+            <input type="range" id="aSigma" min="0" max="5" step="1" value="2" data-ui>
+            <i id="aSigmaV">60</i>
+          </label>
+          <p class="obs">O limiar ajusta o corte de Otsu da imagem. A escala
+             do fundo altera o mapa de segmentação. Os ajustes voltam ao padrão
+             na próxima imagem e ficam registrados na nota ao salvar.</p>
+        </div>
+
+        <div class="pe">
+          <button id="bAjustesZerar" data-ui type="button">↺ Zerar tudo</button>
+          <span id="aEstado"></span>
+        </div>
+      </div>
+
+      <div class="hud" id="hud">—</div>
+      <div class="aviso" id="aviso"></div>
+    </div>
+
+    <footer>
+      <button id="bPrev" title="Anterior (←)">←</button>
+      <button id="bNext" title="Próxima (→)">→</button>
+      <div class="sep"></div>
+      <button id="bOk" class="grande" title="Aceitar o contorno automático (Enter)">✓ Contorno OK</button>
+      <button id="bSalvar" class="grande" title="Salvar a correção manual (Ctrl+Enter)">✓ Salvar correção</button>
+      <button id="bExcluir" class="grande" title="Excluir por qualidade de imagem (X)">✗ Excluir imagem</button>
+      <div class="cresc"></div>
+      <span id="titulo" style="font-weight:700;letter-spacing:.4px"></span>
+      <span id="motivo"></span>
+      <span id="status"></span>
+    </footer>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

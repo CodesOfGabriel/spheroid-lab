@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Galeria do projeto · Spheroid Lab</title>
+  <link rel="stylesheet" href="/estatico/projetos.css">
+  <style>
+    main { padding-block: 24px; }
+    .grade { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+    a { color: var(--verde); text-decoration: none; overflow-wrap: anywhere; }
+    img { display: block; width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <main class="limite">
+    <div class="grade">
+      {% for foto in fotos %}
+      <a href="{{ url_for('galeria.original', nome=foto) }}" target="_blank" rel="noopener">
+        <img src="{{ url_for('galeria.original', nome=foto) }}" alt="" loading="lazy">
+        {{ foto.split('/')[-1] }}
+      </a>
+      {% else %}
+      <p>Este projeto ainda não tem fotos na galeria.</p>
+      {% endfor %}
+    </div>
+  </main>
+</body>
+</html>
